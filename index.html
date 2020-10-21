@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Virtual Green Background</title>
+    <script src="node_modules/@tensorflow/tfjs/dist/tf.min.js" charset="utf-8"></script>
+    <script src="node_modules/@tensorflow-models/body-pix/dist/body-pix.min.js" charset="utf-8"></script>
+    <script src="node_modules/bluebird/js/browser/bluebird.min.js" charset="utf-8"></script>
+    <script src="app.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <video  id="inputVideo" width="640" height="480" autoplay="true" muted></video>
+    <canvas id="outputVideo" width="640" height="480"></canvas>
+    <canvas id="bufferVideo"  width="640" height="480"></canvas>
+  </body>
+</html>
