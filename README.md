@@ -6,6 +6,8 @@ GreenCam is **a virtual green backdrop** for OBS Studio. Yep! You are not crazy.
 
 I do a lot of live streaming at home. There is a small living room, a lot of messy stuffs that needs to hide, not much spaces (and *budget) to setup a standard professional studio. I found there are some applications, like XSplit VCam or Chroma Cam, which removes/changes the background of your video, but I don't want to pay them since I can do exactly the same thing for FREE!!
 
+![Demo GreenCam](docs/images/demo-GreenCam01.gif)
+
 ## How to use GreenCam with OBS Studio
 
 ### Prerequisite
