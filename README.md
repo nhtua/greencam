@@ -55,7 +55,7 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 7. Close the dialog of filters. **Congrats!** You have your new webcam with background removed.
 
 ## Development
-It is a hack I did in one night. But might be some errors, or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
+It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
 - Custom parameters/algorithm to have smoother, better shapes
 - Custom background color, video
 - Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
