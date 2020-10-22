@@ -25,7 +25,7 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
   $ cd /path/to/greencam
   $ npm install
   ```
-3. Edit your application shortcut. I'm using Linux, but Windows should be similar. The ideas is to add some options to the starting command which enables OBS loading a webpage with a WebCam.
+3. Edit your application shortcut. I'm using Linux, but Windows should be similar. The idea is to add some options to the starting command, which enables OBS loading a webpage with a WebCam.
   ```
   $ cd /usr/share/applications/
   $ ls | grep obs
