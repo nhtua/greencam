@@ -52,7 +52,6 @@ function transformFrame(model, sourceVideo, targetCanvasCtx) {
   const tempCtx = tempCanvas.getContext('2d');
         tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   const frame = tempCtx.getImageData(0, 0, w, h);
-  console.log(frame);
   model.segmentPerson(tempCanvas, {
     flipHorizontal: true,
     internalResolution: 'high',
