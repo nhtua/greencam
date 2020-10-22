@@ -5,9 +5,12 @@ window.onload = (event) => {
 function getVideo() {
   return document.getElementById("inputVideo");
 }
-function getCanvasContext(id) {
+function getCanvas(id, getCtx) {
   const canvas = document.getElementById(id);
-  return canvas.getContext('2d');
+  if ( getCtx === true ){
+    return canvas.getContext('2d');
+  }
+  return canvas;
 }
 
 function start() {
@@ -17,7 +20,6 @@ function start() {
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
-
         video.onloadeddata = (e) => {
           initMLModel()
         }
@@ -31,7 +33,7 @@ function start() {
 
 function initMLModel() {
   const video = getVideo();
-  const context = getCanvasContext("outputVideo");
+  const context = getCanvas("outputVideo", true);
   bodyPix.load({
     architechture: 'MobileNetV1',
     outputStride: 16,
@@ -48,11 +50,10 @@ function initMLModel() {
 function transformFrame(model, sourceVideo, targetCanvasCtx) {
   const w = sourceVideo.videoWidth || sourceVideo.width;
   const h = sourceVideo.videoHeight || sourceVideo.height;
-  const tempCanvas = document.getElementById('bufferVideo');
-  const tempCtx = tempCanvas.getContext('2d');
+  const tempCtx = getCanvas('bufferVideo', true);
         tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   const frame = tempCtx.getImageData(0, 0, w, h);
-  model.segmentPerson(tempCanvas, {
+  model.segmentPerson(frame, {
     flipHorizontal: true,
     internalResolution: 'high',
     segmentationThreshold: 0.3,
