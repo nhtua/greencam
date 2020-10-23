@@ -10,8 +10,8 @@
   "author": "Liam Nguyen <liam102ca@outlook.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tensorflow/tfjs": "^2.6.0",
-    "@tensorflow-models/body-pix": "^2.0.5",
+    "@tensorflow/tfjs": "^1.2.0",
+    "@tensorflow-models/body-pix": "^2.0.0",
     "bluebird": "^3.7.2"
   }
 }
