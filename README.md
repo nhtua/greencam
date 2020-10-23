@@ -20,7 +20,7 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 
 ### Follow steps below to setup:
 
-1. Go to https://greencam.netlify.app to test your PC can run this. Copy the URL.
+1. Go to https://greencam.netlify.app to test your PC, make sure it can run.
 
 2. Add two options `--enable-gpu --enable-media-stream` to OBS starting command. If you're using Windows, [see here](https://www.lifewire.com/command-line-parameters-video-games-3399930) how add extra parameters. Commands bellow are only for Linux.
   ```
