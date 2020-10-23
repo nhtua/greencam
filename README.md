@@ -20,13 +20,9 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 
 ### Follow steps below to setup:
 
-1. Download source code from [Github](https://github.com/nhtua/greencam).
-2. Run commands:
-  ```
-  $ cd /path/to/greencam
-  $ npm install
-  ```
-3. Edit your application shortcut. I'm using Linux, but Windows should be similar. The idea is to add some options to the starting command, which enables OBS loading a webpage with a WebCam.
+1. Go to https://greencam.netlify.app to test your PC can run this. Copy the URL.
+
+2. Edit your application shortcut. I'm using Linux, but Windows should be similar. The idea is to add some options to the starting command, which enables OBS loading a webpage with a WebCam.
   ```
   $ cd /usr/share/applications/
   $ ls | grep obs
@@ -38,22 +34,22 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 
   # press : and "x", then press Enter to escape Vi editor
   ```
-4. Open OBS studio, in a scene
+3. Open OBS studio, in a scene
  - click `+` button on the `source` panel
  - choose `Browser`.
  - Name it `GreenCam` then click `OK`
-5. In the next dialog
+4. In the next dialog
   - tick the box `Local file`
   - Pick the file `index.html` from GreenCam source code
   - input width=640, height=480
   - leave everything else default
   - click `OK` at the end.
-6. Right click on your new `source` - `GreenCam`
+5. Right click on your new `source` - `GreenCam`
   - Choose Filter
   - On the `Effect Filters` panel, click `+`
   - Choose `Chroma Key`
   - Key color type = `green`
-7. Close the dialog of filters. **Congrats!** You have your new webcam with background removed.
+6. Close the dialog of filters. **Congrats!** You have your new webcam with background removed.
 
 ## Development
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
