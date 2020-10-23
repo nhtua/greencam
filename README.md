@@ -1,4 +1,5 @@
 # GreenCam
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4ccf5f3b-b414-4da1-bf50-97955adbd300/deploy-status)](https://app.netlify.com/sites/greencam/deploys)
 
 ## What is GreenCam?
 
