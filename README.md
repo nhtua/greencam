@@ -11,12 +11,6 @@ I do a lot of live streaming at home. There is a small living room, a lot of mes
 
 ## How to use GreenCam with OBS Studio
 
-### Prerequisite
-I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in any version support Browser plugin.
-
-- OBS Studio with Browser plugin enabled
-- NodeJS Erbium (12 LTS) or later
-- A webcam
 
 ### Follow steps below to setup:
 You have 2 ways to use GreenCam, with some trading-offs
@@ -27,9 +21,29 @@ You have 2 ways to use GreenCam, with some trading-offs
 **Congrats!** You have your new webcam with background removed.
 
 ## Development
+
+**Prerequisite**
+
+I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in any version support Browser plugin.
+
+- OBS Studio with Browser plugin enabled
+- NodeJS Erbium (12 LTS) or later
+- A webcam
+
+**Contribute your idea**
+
+You need install GreenCam's dependencies first
+```
+$ npm install
+```
+GreenCam is written in vanilla Javascript, you don't need to build/transpile any thing.
+Open `index.html` in your favorite browser and make some change as you wish.
+
+✌️ All Pull Requests are welcome!!
+
+**Road-map**
+
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
 - Custom parameters/algorithm to have smoother, better shapes
 - Custom background color, video
 - Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
-
-All Pull Requests are welcome!!
