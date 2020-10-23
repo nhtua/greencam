@@ -34,29 +34,9 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
   #
   # press : and "x", then press Enter to escape Vi editor
   ```
-3. Open OBS studio, add new source
+3. Open OBS studio, add new source from Browser plugin, using https://greencam.netlify.app Don't forget to add filter Chroma Key to remove green color. If you're not familiar with OBS, follow detailed steps [here](./docs/how-to-use-browser-in-obs.md).
 
-![Source Panel](./docs/images/obs01.png)
-
-![Source Panel](./docs/images/obs02.png)
-
-4. In the next dialog
-
-![Browser Plugin](./docs/images/obs03.png)
-
-![Browser Plugin](./docs/images/obs04.png)
-
-5. Right click on your new `source` - `GreenCam`
-
-![Filter Chroma Key](./docs/images/obs05.png)
-
-![Filter Chroma Key](./docs/images/obs06.png)
-
-use Key Color Type = Green
-![Filter Chroma Key](./docs/images/obs07.png)
-
-
-6. Close the dialog of filters. **Congrats!** You have your new webcam with background removed.
+**Congrats!** You have your new webcam with background removed.
 
 ## Development
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
