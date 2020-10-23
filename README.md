@@ -19,22 +19,10 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 - A webcam
 
 ### Follow steps below to setup:
+You have 2 ways to use GreenCam, with some trading-offs
 
-1. Go to https://greencam.netlify.app to test your PC, make sure it can run.
-
-2. Add two options `--enable-gpu --enable-media-stream` to OBS starting command. If you're using Windows, [see here](https://www.lifewire.com/command-line-parameters-video-games-3399930) how add extra parameters. Commands bellow are only for Linux.
-  ```
-  $ cd /usr/share/applications/
-  $ ls | grep obs
-  # pick the name that you see here. For me, it's `com.obsproject.Studio.desktop`
-
-  $ sudo vi com.obsproject.Studio.desktop
-  # find the line `Exec=`, modify it into the line below
-  # Exec=obs --enable-gpu --enable-media-stream
-  #
-  # press : and "x", then press Enter to escape Vi editor
-  ```
-3. Open OBS studio, add new source from Browser plugin, using https://greencam.netlify.app Don't forget to add filter Chroma Key to remove green color. If you're not familiar with OBS, follow detailed steps [here](./docs/how-to-use-browser-in-obs.md).
+1. 🚲[The easiest way - trade off with a bit flickering](docs/the-easiest-way-to-use-greencam.md)
+2. 🏍️[The hard-way but you have a good performance](docs/how-to-use-browser-in-obs.md)
 
 **Congrats!** You have your new webcam with background removed.
 
