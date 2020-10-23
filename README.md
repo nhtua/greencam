@@ -1,5 +1,5 @@
 # GreenCam
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4ccf5f3b-b414-4da1-bf50-97955adbd300/deploy-status)](https://app.netlify.com/sites/greencam/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4ccf5f3b-b414-4da1-bf50-97955adbd300/deploy-status)](https://greencam.netlify.app)
 
 ## What is GreenCam?
 
@@ -22,7 +22,7 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 
 1. Go to https://greencam.netlify.app to test your PC can run this. Copy the URL.
 
-2. Edit your application shortcut. I'm using Linux, but Windows should be similar. The idea is to add some options to the starting command, which enables OBS loading a webpage with a WebCam.
+2. Add two options to OBS starting command `--enable-gpu --enable-media-stream`. If you're using Windows, [see here](https://www.lifewire.com/command-line-parameters-video-games-3399930) how add extra parameters. Commands bellow are only for Linux.
   ```
   $ cd /usr/share/applications/
   $ ls | grep obs
@@ -30,25 +30,32 @@ I tested GreenCam with my OBS Studio 26. But you should able to run GreenCam in 
 
   $ sudo vi com.obsproject.Studio.desktop
   # find the line `Exec=`, modify it into the line below
-  Exec=obs --enable-gpu --enable-media-stream
-
+  # Exec=obs --enable-gpu --enable-media-stream
+  #
   # press : and "x", then press Enter to escape Vi editor
   ```
-3. Open OBS studio, in a scene
- - click `+` button on the `source` panel
- - choose `Browser`.
- - Name it `GreenCam` then click `OK`
+3. Open OBS studio, add new source
+
+![Source Panel](./docs/images/obs01.png)
+
+![Source Panel](./docs/images/obs02.png)
+
 4. In the next dialog
-  - tick the box `Local file`
-  - Pick the file `index.html` from GreenCam source code
-  - input width=640, height=480
-  - leave everything else default
-  - click `OK` at the end.
+
+![Browser Plugin](./docs/images/obs03.png)
+
+![Browser Plugin](./docs/images/obs04.png)
+
 5. Right click on your new `source` - `GreenCam`
-  - Choose Filter
-  - On the `Effect Filters` panel, click `+`
-  - Choose `Chroma Key`
-  - Key color type = `green`
+
+![Filter Chroma Key](./docs/images/obs05.png)
+
+![Filter Chroma Key](./docs/images/obs06.png)
+
+use Key Color Type = Green
+![Filter Chroma Key](./docs/images/obs07.png)
+
+
 6. Close the dialog of filters. **Congrats!** You have your new webcam with background removed.
 
 ## Development
