@@ -6,12 +6,13 @@
     <script src="node_modules/@tensorflow/tfjs/dist/tf.min.js" charset="utf-8"></script>
     <script src="node_modules/@tensorflow-models/body-pix/dist/body-pix.min.js" charset="utf-8"></script>
     <script src="node_modules/bluebird/js/browser/bluebird.min.js" charset="utf-8"></script>
-    <script src="app.js" charset="utf-8"></script>
+    <script src="app/video-indicator.js" charset="utf-8"></script>
+    <script src="app/main.js" charset="utf-8"></script>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <video  id="inputVideo" width="640" height="480"></video>
+    <video  id="inputVideo" playsinline autoplay width="640" height="480"></video>
     <canvas id="outputVideo" width="640" height="480"></canvas>
-    <canvas id="bufferVideo"  width="640" height="480"></canvas>
+    <canvas id="bufferVideo" width="640" height="480"></canvas>
   </body>
 </html>
