@@ -15,8 +15,8 @@ I do a lot of live streaming at home. There is a small living room, a lot of mes
 ### Follow steps below to setup:
 You have 2 ways to use GreenCam, with some trading-offs
 
-1. 🚲[The easiest way - trade off with a bit flickering](docs/the-easiest-way-to-use-greencam.md)
-2. 🏍️[The hard-way but you have a good performance](docs/how-to-use-browser-in-obs.md)
+1. 🚲[The easy way](docs/the-easiest-way-to-use-greencam.md)
+2. 🏍️[The hard way](docs/how-to-use-browser-in-obs.md)
 
 **Congrats!** You have your new webcam with background removed.
 

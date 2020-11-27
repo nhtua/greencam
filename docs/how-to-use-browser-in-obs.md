@@ -1,5 +1,5 @@
 # How to load a website into OBS using Browser plugin
-_(The **hard-way** but you have a good performance)_
+_(The **hard-way** - not sure the benefit but it's cool)_
 
 
 ### 1. Go to https://greencam.netlify.app
