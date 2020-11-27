@@ -1,7 +1,11 @@
 var indicator = null
-var VIDEOSIZE = {
+var VIDEO_SIZE = {
   width: 0,
   height: 0
+}
+var DEFAULT_SIZE = {
+  width: 640,
+  height: 360,
 }
 
 window.onload = (event) => {
@@ -12,19 +16,26 @@ window.onload = (event) => {
 
 function saveVideoSize(mediaStream) {
   var s = mediaStream.getVideoTracks()[0].getSettings()
-  VIDEOSIZE.width = s.width;
-  VIDEOSIZE.height = s.height;
+  VIDEO_SIZE.width = s.width;
+  VIDEO_SIZE.height = s.height;
 }
 
-function resizeVideo(size) {
-  getVideo('inputVideo').width = VIDEOSIZE.width;
-  getVideo('inputVideo').height = VIDEOSIZE.height;
+function resizeVideo(size, targets) {
+  targets = targets === undefined ? ['input','output','buffer'] : targets;
+  if (targets.indexOf('input') >= 0) {
+    getVideo('inputVideo').width = VIDEO_SIZE.width;
+    getVideo('inputVideo').height = VIDEO_SIZE.height;
+  }
 
-  getCanvas('outputVideo', false).width = VIDEOSIZE.width;
-  getCanvas('outputVideo', false).height = VIDEOSIZE.height;
+  if (targets.indexOf('output') >= 0) {
+    getCanvas('outputVideo', false).width = VIDEO_SIZE.width;
+    getCanvas('outputVideo', false).height = VIDEO_SIZE.height;
+  }
 
-  getCanvas('bufferVideo', false).width = VIDEOSIZE.width;
-  getCanvas('bufferVideo', false).height = VIDEOSIZE.height;
+  if (targets.indexOf('buffer') >= 0) {
+    getCanvas('bufferVideo', false).width = VIDEO_SIZE.width;
+    getCanvas('bufferVideo', false).height = VIDEO_SIZE.height;
+  }
 }
 
 function getVideo() {
@@ -46,13 +57,13 @@ function start() {
       audio: true,
       video: {
         width: { min: 640, ideal: 1280, max: 1920 },
-        height: { min: 480, ideal: 720, max: 1080 }
+        height: { min: 360, ideal: 720, max: 1080 }
       }
     }
     navigator.mediaDevices.getUserMedia(videoConstraint)
       .then(function (stream) {
         saveVideoSize(stream);
-        resizeVideo(VIDEOSIZE);
+        resizeVideo(VIDEO_SIZE, ['input']);
         video.srcObject = stream;
         video.play();
         video.onloadeddata = (e) => {
@@ -84,8 +95,8 @@ function initMLModel() {
 }
 
 function transformFrame(model, sourceVideo, targetCanvasCtx) {
-  var w = sourceVideo.videoWidth || sourceVideo.width;
-  var h = sourceVideo.videoHeight || sourceVideo.height;
+  var w = DEFAULT_SIZE.width;
+  var h = DEFAULT_SIZE.height;
   var tempCtx = getCanvas('bufferVideo', true);
       tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   var frame = tempCtx.getImageData(0, 0, w, h);
