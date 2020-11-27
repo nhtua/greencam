@@ -1,13 +1,36 @@
 var indicator = null
+var VIDEOSIZE = {
+  width: 0,
+  height: 0
+}
+
 window.onload = (event) => {
   indicator = videoIndicator(getCanvas('outputVideo'))
   indicator.loading()
   start()
 }
 
+function saveVideoSize(mediaStream) {
+  var s = mediaStream.getVideoTracks()[0].getSettings()
+  VIDEOSIZE.width = s.width;
+  VIDEOSIZE.height = s.height;
+}
+
+function resizeVideo(size) {
+  getVideo('inputVideo').width = VIDEOSIZE.width;
+  getVideo('inputVideo').height = VIDEOSIZE.height;
+
+  getCanvas('outputVideo', false).width = VIDEOSIZE.width;
+  getCanvas('outputVideo', false).height = VIDEOSIZE.height;
+
+  getCanvas('bufferVideo', false).width = VIDEOSIZE.width;
+  getCanvas('bufferVideo', false).height = VIDEOSIZE.height;
+}
+
 function getVideo() {
   return document.getElementById("inputVideo");
 }
+
 function getCanvas(id, getCtx) {
   var canvas = document.getElementById(id);
   if ( getCtx === true ){
@@ -19,8 +42,17 @@ function getCanvas(id, getCtx) {
 function start() {
   var video = getVideo();
   if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    var videoConstraint = {
+      audio: true,
+      video: {
+        width: { min: 640, ideal: 1280, max: 1920 },
+        height: { min: 480, ideal: 720, max: 1080 }
+      }
+    }
+    navigator.mediaDevices.getUserMedia(videoConstraint)
       .then(function (stream) {
+        saveVideoSize(stream);
+        resizeVideo(VIDEOSIZE);
         video.srcObject = stream;
         video.play();
         video.onloadeddata = (e) => {
