@@ -6,7 +6,7 @@ Access https://greencam.netlify.app using your web browser (Chrome/Safari/Firefo
 
 ![GreenCam online](./images/capture-window-01.png)
 
-### 2. Open OBS studio, add new source from Browser plugin
+### 2. Open OBS studio, add new source from Windows Capture
 
 ![Source Panel](./images/obs01.png)
 
