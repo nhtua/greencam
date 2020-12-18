@@ -100,25 +100,27 @@ function transformFrame(model, sourceVideo, targetCanvasCtx) {
   var tempCtx = getCanvas('bufferVideo', true);
       tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   var frame = tempCtx.getImageData(0, 0, w, h);
-  model.segmentPerson(frame, {
+  model.segmentMultiPerson(frame, {
     flipHorizontal: true,
     internalResolution: 'high',
     segmentationThreshold: 0.3,
     scoreThreshold: 0.3,
     maxDetections: 1,
     nmsRadius: 20
-  }).then(segment => {
-    for (var x = 0; x < w; x++) {
-      for (var y = 0; y < h; y++) {
-        var n = x + y * w;
-        if(segment.data[n] == 0) {
-          frame.data[n * 4 + 0] = 0;
-          frame.data[n * 4 + 1] = 255;
-          frame.data[n * 4 + 2] = 0;
-          frame.data[n * 4 + 3] = 255;
+  }).then(segments => {
+    segments.forEach(segment => {
+      for (var x = 0; x < w; x++) {
+        for (var y = 0; y < h; y++) {
+          var n = x + y * w;
+          if(segment.data[n] == 0) {
+            frame.data[n * 4 + 0] = 0;
+            frame.data[n * 4 + 1] = 255;
+            frame.data[n * 4 + 2] = 0;
+            frame.data[n * 4 + 3] = 255;
+          }
         }
       }
-    }
+    });
     targetCanvasCtx.putImageData(frame, 0, 0);
     window.requestAnimationFrame(()=>{
       transformFrame(model, sourceVideo, targetCanvasCtx)
