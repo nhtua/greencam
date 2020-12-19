@@ -108,19 +108,32 @@ function transformFrame(model, sourceVideo, targetCanvasCtx) {
     maxDetections: 1,
     nmsRadius: 20
   }).then(segments => {
-    segments.forEach(segment => {
+    if (typeof segments !== 'undefined' && segments.length > 0) {
+      segments.forEach(segment => {
+        for (var x = 0; x < w; x++) {
+          for (var y = 0; y < h; y++) {
+            var n = x + y * w;
+            if(segment.data[n] == 0) {
+              frame.data[n * 4 + 0] = 0;
+              frame.data[n * 4 + 1] = 255;
+              frame.data[n * 4 + 2] = 0;
+              frame.data[n * 4 + 3] = 255;
+            }
+          }
+        }
+      });
+    } else {
       for (var x = 0; x < w; x++) {
         for (var y = 0; y < h; y++) {
           var n = x + y * w;
-          if(segment.data[n] == 0) {
-            frame.data[n * 4 + 0] = 0;
-            frame.data[n * 4 + 1] = 255;
-            frame.data[n * 4 + 2] = 0;
-            frame.data[n * 4 + 3] = 255;
-          }
+          frame.data[n * 4 + 0] = 0;
+          frame.data[n * 4 + 1] = 255;
+          frame.data[n * 4 + 2] = 0;
+          frame.data[n * 4 + 3] = 255;
         }
       }
-    });
+    }
+
     targetCanvasCtx.putImageData(frame, 0, 0);
     window.requestAnimationFrame(()=>{
       transformFrame(model, sourceVideo, targetCanvasCtx)
