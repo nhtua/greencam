@@ -50,24 +50,6 @@ function getCanvas(id, getCtx) {
   return canvas;
 }
 
-/**
- * Return an Image object from canvas
- * @method imageFromCanvas
- * @param  {Canvas}        canvas Canvas object or HTML DOM id of canvas object
- * @return {Promise<Image>}
- */
-function imageFromCanvas(canvas) {
-  if (typeof canvas == 'string') {
-    canvas = getCanvas(canvas, false);
-  }
-  return new Promise(function(resolve, reject) {
-    var img = new Image();
-    img.src = canvas.toDataURL();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-  });
-}
-
 function start() {
   var video = getVideo();
   if (navigator.mediaDevices.getUserMedia) {
