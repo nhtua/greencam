@@ -23,18 +23,18 @@ function saveVideoSize(mediaStream) {
 function resizeVideo(size, targets) {
   targets = targets === undefined ? ['input','output','buffer'] : targets;
   if (targets.indexOf('input') >= 0) {
-    getVideo('inputVideo').width = VIDEO_SIZE.width;
-    getVideo('inputVideo').height = VIDEO_SIZE.height;
+    getVideo('inputVideo').width = size.width;
+    getVideo('inputVideo').height = size.height;
   }
 
   if (targets.indexOf('output') >= 0) {
-    getCanvas('outputVideo', false).width = VIDEO_SIZE.width;
-    getCanvas('outputVideo', false).height = VIDEO_SIZE.height;
+    getCanvas('outputVideo', false).width = size.width;
+    getCanvas('outputVideo', false).height = size.height;
   }
 
   if (targets.indexOf('buffer') >= 0) {
-    getCanvas('bufferVideo', false).width = VIDEO_SIZE.width;
-    getCanvas('bufferVideo', false).height = VIDEO_SIZE.height;
+    getCanvas('bufferVideo', false).width = size.width;
+    getCanvas('bufferVideo', false).height = size.height;
   }
 }
 
@@ -48,6 +48,24 @@ function getCanvas(id, getCtx) {
     return canvas.getContext('2d');
   }
   return canvas;
+}
+
+/**
+ * Return an Image object from canvas
+ * @method imageFromCanvas
+ * @param  {Canvas}        canvas Canvas object or HTML DOM id of canvas object
+ * @return {Promise<Image>}
+ */
+function imageFromCanvas(canvas) {
+  if (typeof canvas == 'string') {
+    canvas = getCanvas(canvas, false);
+  }
+  return new Promise(function(resolve, reject) {
+    var img = new Image();
+    img.src = canvas.toDataURL();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+  });
 }
 
 function start() {
@@ -64,6 +82,7 @@ function start() {
       .then(function (stream) {
         saveVideoSize(stream);
         resizeVideo(VIDEO_SIZE, ['input']);
+        resizeVideo(VIDEO_SIZE, ['output','buffer']);
         video.srcObject = stream;
         video.play();
         video.onloadeddata = (e) => {
@@ -79,7 +98,7 @@ function start() {
 
 function initMLModel() {
   var video = getVideo();
-  var context = getCanvas("outputVideo", true);
+  var canvas = getCanvas("outputVideo");
   bodyPix.load({
     architechture: 'MobileNetV1',
     outputStride: 16,
@@ -88,57 +107,46 @@ function initMLModel() {
   }).then(model => {
     console.log('BodyPix model loaded.');
     indicator.stop();
-    transformFrame(model, video, context);
+    transformFrame(model, video, canvas);
   }).catch(err => {
     console.error(err);
   })
 }
 
-function setChromaKey(imageData, pixelIndex) {
-  imageData.data[pixelIndex * 4 + 0] = 0;
-  imageData.data[pixelIndex * 4 + 1] = 255;
-  imageData.data[pixelIndex * 4 + 2] = 0;
-  imageData.data[pixelIndex * 4 + 3] = 255;
-}
-
-function transformFrame(model, sourceVideo, targetCanvasCtx) {
-  var w = DEFAULT_SIZE.width;
-  var h = DEFAULT_SIZE.height;
+function transformFrame(model, sourceVideo, targetCanvas) {
+  var w = VIDEO_SIZE.width;
+  var h = VIDEO_SIZE.height;
   var tempCtx = getCanvas('bufferVideo', true);
       tempCtx.drawImage(sourceVideo, 0, 0, w, h);
-  var frame = tempCtx.getImageData(0, 0, w, h);
+  var frame = getCanvas('bufferVideo');
+
   model.segmentMultiPerson(frame, {
     flipHorizontal: true,
-    internalResolution: 'high',
-    segmentationThreshold: 0.3,
+    internalResolution: 'medium',
+    segmentationThreshold: 0.6,
     scoreThreshold: 0.3,
-    maxDetections: 1,
+    maxDetections: 3,
     nmsRadius: 20
   }).then(segments => {
     if (typeof segments !== 'undefined' && segments.length > 0) {
-      segments.forEach(segment => {
-        for (var x = 0; x < w; x++) {
-          for (var y = 0; y < h; y++) {
-            var n = x + y * w;
-            if(segment.data[n] == 0) {
-              setChromaKey(frame, n);
-            }
-          }
-        }
-      });
+      const foregroundColor = {r: 0, g: 0,   b: 0, a: 0};
+      const backgroundColor = {r: 0, g: 255, b: 0, a: 255};
+      var maskSegmentation = bodyPix.toMask( segments, foregroundColor, backgroundColor);
+      bodyPix.drawMask(
+        targetCanvas,
+        frame,
+        maskSegmentation,
+        1, // opacity
+        3, // mask blur amount,
+        true // flip horizontal
+      );
     } else {
-      // In case of nobody detected, make all green
-      for (var x = 0; x < w; x++) {
-        for (var y = 0; y < h; y++) {
-          var n = x + y * w;
-          setChromaKey(frame, n);
-        }
-      }
+      tempCtx.fillStyle = "#00FF00";
+      tempCtx.fillRect(0,0, VIDEO_SIZE.width, VIDEO_SIZE.height);
+      getCanvas('outputVideo', true).drawImage(frame, 0,0);
     }
-
-    targetCanvasCtx.putImageData(frame, 0, 0);
     window.requestAnimationFrame(()=>{
-      transformFrame(model, sourceVideo, targetCanvasCtx)
+      transformFrame(model, sourceVideo, targetCanvas)
     });
   }).catch(err => {
     console.error(err);
