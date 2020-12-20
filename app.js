@@ -123,6 +123,7 @@ function transformFrame(model, sourceVideo, targetCanvas) {
         true // flip horizontal
       );
     } else {
+      // In case of nobody detected, make all green
       tempCtx.fillStyle = "#00FF00";
       tempCtx.fillRect(0,0, VIDEO_SIZE.width, VIDEO_SIZE.height);
       getCanvas('outputVideo', true).drawImage(frame, 0,0);
