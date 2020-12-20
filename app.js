@@ -94,6 +94,13 @@ function initMLModel() {
   })
 }
 
+function setChromaKey(imageData, pixelIndex) {
+  imageData.data[pixelIndex * 4 + 0] = 0;
+  imageData.data[pixelIndex * 4 + 1] = 255;
+  imageData.data[pixelIndex * 4 + 2] = 0;
+  imageData.data[pixelIndex * 4 + 3] = 255;
+}
+
 function transformFrame(model, sourceVideo, targetCanvasCtx) {
   var w = DEFAULT_SIZE.width;
   var h = DEFAULT_SIZE.height;
@@ -114,22 +121,17 @@ function transformFrame(model, sourceVideo, targetCanvasCtx) {
           for (var y = 0; y < h; y++) {
             var n = x + y * w;
             if(segment.data[n] == 0) {
-              frame.data[n * 4 + 0] = 0;
-              frame.data[n * 4 + 1] = 255;
-              frame.data[n * 4 + 2] = 0;
-              frame.data[n * 4 + 3] = 255;
+              setChromaKey(frame, n);
             }
           }
         }
       });
     } else {
+      // In case of nobody detected, make all green
       for (var x = 0; x < w; x++) {
         for (var y = 0; y < h; y++) {
           var n = x + y * w;
-          frame.data[n * 4 + 0] = 0;
-          frame.data[n * 4 + 1] = 255;
-          frame.data[n * 4 + 2] = 0;
-          frame.data[n * 4 + 3] = 255;
+          setChromaKey(frame, n);
         }
       }
     }
