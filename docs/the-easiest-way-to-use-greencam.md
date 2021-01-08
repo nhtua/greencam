@@ -1,5 +1,5 @@
 # How to use GreenCam without any extra installation
-_(The easiest way - but cost time to arrange top/left/bottom/right cut size)_
+_(The easiest way - You have to manually arrange top/left/bottom/right cut size every time you start streaming)_
 
 ### 1. Access GreenCam online
 Access https://greencam.netlify.app using your web browser (Chrome/Safari/Firefox)
