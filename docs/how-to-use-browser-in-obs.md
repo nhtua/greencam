@@ -19,20 +19,28 @@ If you're using Windows, [see here](https://www.lifewire.com/command-line-parame
   #
   # press : and "x", then press Enter to escape Vi editor
   ```
+### 3. Install GreenCam dependencies
+Open terminal/Window prompt
+```
+$ cd /path/to/greencam
+$ npm install
+```
 
-### 3. Open OBS studio, add new source from Browser plugin
+NPM is a package manager of NodeJS programming runtime. If you don't have both NodeJS and NPM, please follow the link here ([Linux](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-18-04) | [Windows](https://phoenixnap.com/kb/install-node-js-npm-on-windows)) to install NodeJS first. NPM is shipped with NodeJS.
+
+### 4. Open OBS studio, add new source from Browser plugin
 
 ![Source Panel](./images/obs01.png)
 
 ![Source Panel](./images/obs02.png)
 
-### 4. In the next dialog
+### 5. In the next dialog
 
 ![Browser Plugin](./images/obs03.png)
 
 ![Browser Plugin](./images/obs04.png)
 
-### 5. Right click on your new `source` - `GreenCam`
+### 6. Right click on your new `source` - `GreenCam`
 
 ![Filter Chroma Key](./images/obs05.png)
 
