@@ -7,17 +7,30 @@ var DEFAULT_SIZE = {
   width: 640,
   height: 360,
 }
+var stats = null;
 
-window.onload = (event) => {
+function loadapp() {	
   indicator = videoIndicator(getCanvas('outputVideo'))
   indicator.loading()
   start()
+}
+
+window.onload = (event) => {
+		
+  if (typeof Stats !== 'undefined' && Stats) {
+	  stats = new Stats();
+	  stats.showPanel(0);
+	  document.getElementById("stats").appendChild(stats.dom);
+  }
+  loadapp()
 }
 
 function saveVideoSize(mediaStream) {
   var s = mediaStream.getVideoTracks()[0].getSettings()
   VIDEO_SIZE.width = s.width;
   VIDEO_SIZE.height = s.height;
+  console.log("setting webcame size to: " + s.width + "x" + s.height);
+  camSizeChange(s.width, s.height);
 }
 
 function resizeVideo(size, targets) {
@@ -55,13 +68,23 @@ function errorMessage(message) {
 	error.textContent = message;
 }
 
+function camSizeChange(width, height) {
+	var elem = document.getElementById("cam_size");
+	if (elem) {
+		elem.textContent = "Webcam size: " + width + "x" + height;
+	}
+}
+
+var loadParams = getLoadParams();
+var modelParams = getModelParams();
+
 function getLoadParams() {
 	const urlParams = new URLSearchParams(window.location.search);
 	var loadParams = {		
-		architecture: urlParams.get('net') || 'MobileNetV1',
-		outputStride: parseInt(urlParams.get('stride')) || 16,
-		multiplier: parseFloat(urlParams.get('mult')) || 0.75,
-		quantBytes: parseInt(urlParams.get('quant')) || 2,
+		architecture: urlParams.get('architecture') || 'MobileNetV1',
+		outputStride: parseInt(urlParams.get('outputStride')) || 16,
+		multiplier: parseFloat(urlParams.get('multiplier')) || 0.75,
+		quantBytes: parseInt(urlParams.get('quantBytes')) || 2,
 	};
 	return loadParams;
 }
@@ -69,13 +92,13 @@ function getLoadParams() {
 function getModelParams() {
 	const urlParams = new URLSearchParams(window.location.search);
 	var modelParams = {
-		flipHorizontal: urlParams.get('flip') == null ? true : urlParams.get('flip') == "true",
-		internalResolution: urlParams.get('res') || "medium",
-		segmentationThreshold: parseFloat(urlParams.get('thresh')) || 0.7,
+		flipHorizontal: urlParams.get('flipHorizontal') == null ? true : urlParams.get('flipHorizontal') == "true",
+		internalResolution: urlParams.get('internalResolution') || "medium",
+		segmentationThreshold: parseFloat(urlParams.get('segmentationThreshold')) || 0.7,
 		maxDetections: parseInt(urlParams.get('maxDetections')) || 10,
-		scoreThreshold: parseFloat(urlParams.get('scoreThres')) || 0.3,
-		nmsRadius: parseInt(urlParams.get('rad')) || 20,
-		maskBlurAmount : parseInt(urlParams.get('blur')) || 3,
+		scoreThreshold: parseFloat(urlParams.get('scoreThreshold')) || 0.3,
+		nmsRadius: parseInt(urlParams.get('nmsRadius')) || 20,
+		maskBlurAmount : parseInt(urlParams.get('maskBlurAmount')) || 3,
 	};
 	return modelParams;
 }
@@ -92,6 +115,7 @@ function start() {
     }
     navigator.mediaDevices.getUserMedia(videoConstraint)
       .then(function (stream) {
+		errorMessage('');
         saveVideoSize(stream);
         resizeVideo(VIDEO_SIZE, ['input']);
         resizeVideo(VIDEO_SIZE, ['output','buffer']);
@@ -102,6 +126,7 @@ function start() {
         }
       })
       .catch(function (err) {
+		errorMessage("Couldn't get the webcam object! " + err.message);
         console.log("Something went wrong!");
         console.error(err);
       });
@@ -111,17 +136,15 @@ function start() {
 async function initMLModel() {
   var video = getVideo();
   var canvas = getCanvas("outputVideo");
-  var params = getLoadParams();
   console.log('Loading model with params:');
-  console.log(params);
-  await bodyPix.load(params).then(model => {
+  console.log(loadParams);
+  await bodyPix.load(loadParams).then(model => {
     console.log('BodyPix model loaded.');
     indicator.stop();
 	
-	var params2 = getModelParams();
 	console.log('Model parameters:');
-	console.log(params2);
-    transformFrame(model, video, canvas, params2);
+	console.log(modelParams);
+    transformFrame(model, video, canvas);
   }).catch(err => {
     indicator.stop();
     errorMessage(err.message);
@@ -129,14 +152,14 @@ async function initMLModel() {
   })
 }
 
-async function transformFrame(model, sourceVideo, targetCanvas, params) {
+async function transformFrame(model, sourceVideo, targetCanvas) {
   var w = VIDEO_SIZE.width;
   var h = VIDEO_SIZE.height;
   var tempCtx = getCanvas('bufferVideo', true);
       tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   var frame = getCanvas('bufferVideo');
 
-  await model.segmentPerson(frame, params).then(segments => {
+  await model.segmentPerson(frame, modelParams).then(segments => {
       const foregroundColor = {r: 0, g: 0,   b: 0, a: 0};
       const backgroundColor = {r: 0, g: 255, b: 0, a: 255};
       var maskSegmentation = bodyPix.toMask( segments, foregroundColor, backgroundColor);
@@ -145,11 +168,13 @@ async function transformFrame(model, sourceVideo, targetCanvas, params) {
         frame,
         maskSegmentation,
         1, // opacity
-        params.maskBlurAmount, // mask blur amount,
-        params.flipHorizontal // flip horizontal
+        modelParams.maskBlurAmount, // mask blur amount,
+        modelParams.flipHorizontal // flip horizontal
       );
     window.requestAnimationFrame(()=>{
-      transformFrame(model, sourceVideo, targetCanvas, params)
+      if (stats) stats.begin();
+      transformFrame(model, sourceVideo, targetCanvas)
+      if (stats) stats.end();
     });
   }).catch(err => {
     console.error(err);

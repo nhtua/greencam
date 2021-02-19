@@ -4,15 +4,16 @@
   "description": "Virtual Green Background for Webcam",
   "main": "app.js",
   "scripts": {
-    "build":"rm -rf dist && mkdir dist && rsync -rv * dist --exclude ./dist",
+    "build": "rm -rf dist && mkdir dist && rsync -rv * dist --exclude ./dist",
     "test": "echo \"No test!\""
   },
   "repository": "https://github.com/nhtua/greencam/",
   "author": "Liam Nguyen <liam102ca@outlook.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tensorflow/tfjs": "^1.2.0",
     "@tensorflow-models/body-pix": "^2.0.0",
-    "bluebird": "^3.7.2"
+    "@tensorflow/tfjs": "^1.2.0",
+    "bluebird": "^3.7.2",
+    "stats.js": "^0.17.0"
   }
 }
