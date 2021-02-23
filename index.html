@@ -11,7 +11,9 @@
 		const urlParams = new URLSearchParams(window.location.search);
 		var urlBase = location.href.substring(0, location.href.lastIndexOf("/")+1);
 		function updateUrl() {
-			document.getElementById('paramsUrl').value = urlBase + 'player.html?' + new URLSearchParams(Object.assign({}, loadParams, modelParams)).toString();
+			var url = urlBase + 'player.html?' + new URLSearchParams(Object.assign({}, loadParams, modelParams)).toString();
+			document.getElementById('paramsUrl').href = url;
+			document.getElementById('paramsUrl').innerHTML = url;			
 		}
 		function updateLoadParam(key, val){
 			loadParams[key] = val;
@@ -76,6 +78,6 @@
 	<input type="number" step="1" name="maskBlurAmount" value="3" id="maskBlurAmount" onchange="updateModelParam('maskBlurAmount', parseInt(this.value));"/>
 	</br>
 	<label for="paramsUrl">Url String:</label>
-	<input type="text" id="paramsUrl" name="paramsUrl" onkeydown="return false" style="width:700px"><br><br>
+	<a id="paramsUrl" name="paramsUrl" /><br><br>
   </body>
 </html>
