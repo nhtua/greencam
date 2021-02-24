@@ -7,17 +7,30 @@ var DEFAULT_SIZE = {
   width: 640,
   height: 360,
 }
+var stats = null;
 
-window.onload = (event) => {
+function loadapp() {	
   indicator = videoIndicator(getCanvas('outputVideo'))
   indicator.loading()
   start()
+}
+
+window.onload = (event) => {
+		
+  if (typeof Stats !== 'undefined' && Stats) {
+	  stats = new Stats();
+	  stats.showPanel(0);
+	  document.getElementById("stats").appendChild(stats.dom);
+  }
+  loadapp()
 }
 
 function saveVideoSize(mediaStream) {
   var s = mediaStream.getVideoTracks()[0].getSettings()
   VIDEO_SIZE.width = s.width;
   VIDEO_SIZE.height = s.height;
+  console.log("setting webcame size to: " + s.width + "x" + s.height);
+  camSizeChange(s.width, s.height);
 }
 
 function resizeVideo(size, targets) {
@@ -50,6 +63,46 @@ function getCanvas(id, getCtx) {
   return canvas;
 }
 
+function errorMessage(message) {
+	var error = document.getElementById('error');
+	error.textContent = message;
+}
+
+function camSizeChange(width, height) {
+	var elem = document.getElementById("cam_size");
+	if (elem) {
+		elem.textContent = "Webcam size: " + width + "x" + height;
+	}
+}
+
+var loadParams = getLoadParams();
+var modelParams = getModelParams();
+
+function getLoadParams() {
+	const urlParams = new URLSearchParams(window.location.search);
+	var loadParams = {		
+		architecture: urlParams.get('architecture') || 'MobileNetV1',
+		outputStride: parseInt(urlParams.get('outputStride')) || 16,
+		multiplier: parseFloat(urlParams.get('multiplier')) || 0.75,
+		quantBytes: parseInt(urlParams.get('quantBytes')) || 2,
+	};
+	return loadParams;
+}
+
+function getModelParams() {
+	const urlParams = new URLSearchParams(window.location.search);
+	var modelParams = {
+		flipHorizontal: urlParams.get('flipHorizontal') == null ? true : urlParams.get('flipHorizontal') == "true",
+		internalResolution: urlParams.get('internalResolution') || "medium",
+		segmentationThreshold: parseFloat(urlParams.get('segmentationThreshold')) || 0.7,
+		maxDetections: parseInt(urlParams.get('maxDetections')) || 10,
+		scoreThreshold: parseFloat(urlParams.get('scoreThreshold')) || 0.3,
+		nmsRadius: parseInt(urlParams.get('nmsRadius')) || 20,
+		maskBlurAmount : parseInt(urlParams.get('maskBlurAmount')) || 3,
+	};
+	return modelParams;
+}
+
 function start() {
   var video = getVideo();
   if (navigator.mediaDevices.getUserMedia) {
@@ -62,6 +115,7 @@ function start() {
     }
     navigator.mediaDevices.getUserMedia(videoConstraint)
       .then(function (stream) {
+		errorMessage('');
         saveVideoSize(stream);
         resizeVideo(VIDEO_SIZE, ['input']);
         resizeVideo(VIDEO_SIZE, ['output','buffer']);
@@ -72,45 +126,40 @@ function start() {
         }
       })
       .catch(function (err) {
+		errorMessage("Couldn't get the webcam object! " + err.message);
         console.log("Something went wrong!");
         console.error(err);
       });
   }
 }
 
-function initMLModel() {
+async function initMLModel() {
   var video = getVideo();
   var canvas = getCanvas("outputVideo");
-  bodyPix.load({
-    architechture: 'MobileNetV1',
-    outputStride: 16,
-    multiplier: 0.75,
-    quantBytes: 2
-  }).then(model => {
+  console.log('Loading model with params:');
+  console.log(loadParams);
+  await bodyPix.load(loadParams).then(model => {
     console.log('BodyPix model loaded.');
     indicator.stop();
+	
+	console.log('Model parameters:');
+	console.log(modelParams);
     transformFrame(model, video, canvas);
   }).catch(err => {
+    indicator.stop();
+    errorMessage(err.message);
     console.error(err);
   })
 }
 
-function transformFrame(model, sourceVideo, targetCanvas) {
+async function transformFrame(model, sourceVideo, targetCanvas) {
   var w = VIDEO_SIZE.width;
   var h = VIDEO_SIZE.height;
   var tempCtx = getCanvas('bufferVideo', true);
       tempCtx.drawImage(sourceVideo, 0, 0, w, h);
   var frame = getCanvas('bufferVideo');
 
-  model.segmentMultiPerson(frame, {
-    flipHorizontal: true,
-    internalResolution: 'medium',
-    segmentationThreshold: 0.6,
-    scoreThreshold: 0.3,
-    maxDetections: 3,
-    nmsRadius: 20
-  }).then(segments => {
-    if (typeof segments !== 'undefined' && segments.length > 0) {
+  await model.segmentPerson(frame, modelParams).then(segments => {
       const foregroundColor = {r: 0, g: 0,   b: 0, a: 0};
       const backgroundColor = {r: 0, g: 255, b: 0, a: 255};
       var maskSegmentation = bodyPix.toMask( segments, foregroundColor, backgroundColor);
@@ -119,17 +168,13 @@ function transformFrame(model, sourceVideo, targetCanvas) {
         frame,
         maskSegmentation,
         1, // opacity
-        3, // mask blur amount,
-        true // flip horizontal
+        modelParams.maskBlurAmount, // mask blur amount,
+        modelParams.flipHorizontal // flip horizontal
       );
-    } else {
-      // In case of nobody detected, make all green
-      tempCtx.fillStyle = "#00FF00";
-      tempCtx.fillRect(0,0, VIDEO_SIZE.width, VIDEO_SIZE.height);
-      getCanvas('outputVideo', true).drawImage(frame, 0,0);
-    }
     window.requestAnimationFrame(()=>{
+      if (stats) stats.begin();
       transformFrame(model, sourceVideo, targetCanvas)
+      if (stats) stats.end();
     });
   }).catch(err => {
     console.error(err);
