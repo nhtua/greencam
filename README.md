@@ -1,6 +1,10 @@
 # GreenCam
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4ccf5f3b-b414-4da1-bf50-97955adbd300/deploy-status)](https://greencam.netlify.app) 👈 Try it here!
 
+## __Special note for version pre-v1.0.0 (online version)__
+
+The online version which is hosted on netlify is always up to date. Latest version is `pre-v1.0.0`. This new version gives you abitlity to control GreenCam parameters, play with it back and forth until you satisfy with GreenCam's output. Just remember to click on a button - **reload model** - to refresh and preview your choices. At the end of home page, you'll get a generated URL, which will hide all other controller, make you a clean output for OBS. You can consume this URL in OBS Browser plugin or open in a new tab.
+
 ## What is GreenCam?
 
 GreenCam is **a virtual green backdrop** for OBS Studio. Yep! You are not crazy. It basically replaces every thing around you by green color. So that you can use the Chroma Key filter in OBS Studio to put yourself in any other video. GreenCam is powered by a machine learning technology called [Tensorflow](https://github.com/tensorflow/tfjs) and its public model [BodyPix](https://github.com/tensorflow/tfjs-models/tree/master/body-pix).
