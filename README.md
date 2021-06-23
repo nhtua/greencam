@@ -48,6 +48,6 @@ Open `index.html` in your favorite browser and make some change as you wish.
 **Road-map**
 
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
-- Custom parameters/algorithm to have smoother, better shapes
-- Custom background color, video
-- Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
+[x] Custom parameters/algorithm to have smoother, better shapes
+[ ] Custom background color, video
+[ ] Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
