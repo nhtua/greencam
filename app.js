@@ -78,9 +78,53 @@ function camSizeChange(width, height) {
 var loadParams = getLoadParams();
 var modelParams = getModelParams();
 
+function setCameraDevices(devices) {
+  var cameraSelect = document.getElementById('camera');
+  if (cameraSelect) {
+    while (cameraSelect.children.length > 1) {
+      cameraSelect.removeChild(cameraSelect.lastElementChild);
+    }
+    var selectOption;
+    for (var i = 0; i < devices.length; i++) {
+      selectOption = document.createElement("option");
+      selectOption.innerText = devices[i].label;
+      selectOption.value = devices[i].label;
+      cameraSelect.appendChild(selectOption);
+    }
+  }
+  var altCameraSelect = document.getElementById('altCamera');
+  if (altCameraSelect) {
+    while (altCameraSelect.children.length > 1) {
+      altCameraSelect.removeChild(altCameraSelect.lastElementChild);
+    }
+    var selectOption;
+    for (var i = 0; i < devices.length; i++) {
+      selectOption = document.createElement("option");
+      selectOption.innerText = devices[i].label;
+      selectOption.value = devices[i].label;
+      altCameraSelect.appendChild(selectOption);
+    }
+  }
+}
+
+function setCamera(camera, altCamera) {
+  var cameraSelect = document.getElementById('camera');
+  if (cameraSelect) {
+    cameraSelect.value = camera;
+  }
+  var altCameraSelect = document.getElementById('altCamera');
+  if (altCameraSelect) {
+    altCameraSelect.value = altCamera;
+  }
+  loadParams.camera = camera;
+  loadParams.altCamera = altCamera;
+}
+
 function getLoadParams() {
 	const urlParams = new URLSearchParams(window.location.search);
 	var loadParams = {		
+    camera: urlParams.get('camera') || '',
+    altCamera: urlParams.get('altCamera') || '',
 		architecture: urlParams.get('architecture') || 'MobileNetV1',
 		outputStride: parseInt(urlParams.get('outputStride')) || 16,
 		multiplier: parseFloat(urlParams.get('multiplier')) || 0.75,
@@ -103,7 +147,7 @@ function getModelParams() {
 	return modelParams;
 }
 
-function start() {
+async function start() {
   var video = getVideo();
   if (navigator.mediaDevices.getUserMedia) {
     var videoConstraint = {
@@ -113,16 +157,24 @@ function start() {
         height: { min: 360, ideal: 720, max: 1080 }
       }
     }
+    var deviceId = await getDevices();
+    if (deviceId) {
+      videoConstraint.video.deviceId = deviceId;
+    }
     navigator.mediaDevices.getUserMedia(videoConstraint)
       .then(function (stream) {
-		errorMessage('');
+        errorMessage('');
         saveVideoSize(stream);
         resizeVideo(VIDEO_SIZE, ['input']);
         resizeVideo(VIDEO_SIZE, ['output','buffer']);
         video.srcObject = stream;
         video.play();
         video.onloadeddata = (e) => {
-          initMLModel()
+          if (deviceId === undefined) {
+            start();
+          } else {
+            initMLModel();
+          }
         }
       })
       .catch(function (err) {
@@ -131,6 +183,46 @@ function start() {
         console.error(err);
       });
   }
+}
+
+function getDevices() {
+  return new Promise(function(resolve) {
+    if (navigator.mediaDevices.enumerateDevices) {
+      navigator.mediaDevices.enumerateDevices()
+        .then(function (devices) {
+          var videoDevices = devices.filter(device => device.kind === 'videoinput');
+            if (videoDevices.length > 1 || videoDevices[0].deviceId !== '' && videoDevices[0].label !== '') {
+              setCameraDevices(videoDevices);
+              var cameraLabel = loadParams.camera;
+              var foundDevice = videoDevices.find(device => device.label === cameraLabel);
+              var altCameraLabel = loadParams.altCamera;
+              var foundAltDevice = videoDevices.find(device => device.label === altCameraLabel);
+              if (foundDevice) {
+                if (foundAltDevice) {
+                  setCamera(foundDevice.label, foundAltDevice.label);
+                } else {
+                  setCamera(foundDevice.label, '');
+                }
+                resolve(foundDevice.deviceId);
+              } else {
+                if (foundAltDevice) {
+                  setCamera('', foundAltDevice.label);
+                  resolve(foundAltDevice.deviceId);
+                } else {
+                  setCamera('', '');
+                  resolve('');
+                }
+              }
+            } else {
+              resolve();
+            }
+        }).catch(function () {
+          resolve(false);
+        });
+    } else {
+      resolve(false);
+    }
+  });
 }
 
 async function initMLModel() {

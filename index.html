@@ -8,6 +8,8 @@
     <script src="node_modules/bluebird/js/browser/bluebird.min.js" charset="utf-8"></script>
     <script src="node_modules/stats.js/build/stats.min.js" charset="utf-8"></script>
 	<script>
+		var loadParams = {};
+		var modelParams = {};
 		const urlParams = new URLSearchParams(window.location.search);
 		var urlBase = location.href.substring(0, location.href.lastIndexOf("/")+1);
 		function updateUrl() {
@@ -34,6 +36,14 @@
     <canvas id="outputVideo" width="640" height="480"></canvas>
     <canvas id="bufferVideo"  width="640" height="480"></canvas>
 	<div id="cam_size"></div>
+	<label for="camera">Camera:</label>
+	<select name="camera" id="camera" onchange="updateLoadParam('camera', this.value);">
+	  <option value="">default</option>
+	</select>
+	<label for="altCamera">Alternative Camera (If not available):</label>
+	<select name="altCamera" id="altCamera" onchange="updateLoadParam('altCamera', this.value);">
+	  <option value="">default</option>
+	</select>
 	<label for="net">Network:</label>
 	<select name="net" id="net" onchange="updateLoadParam('architecture', this.value);">
 	  <option value="MobileNetV1" selected="selected">MobileNetV1</option>
@@ -79,5 +89,8 @@
 	</br>
 	<label for="paramsUrl">Url String:</label>
 	<a id="paramsUrl" name="paramsUrl" /><br><br>
+	<script>
+		updateUrl();
+	</script>
   </body>
 </html>
