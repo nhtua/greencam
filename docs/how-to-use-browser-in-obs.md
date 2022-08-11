@@ -43,7 +43,7 @@ $ npm start
 In the URL, input `http://localhost:3000`
 To make sure the web tool worked, you can access this URL from Google Chrome and play with it.
 
-### 6. Right click on your new `source` - `GreenCam`
+### 5. Right click on your new `source` - `GreenCam`
 
 ![Filter Chroma Key](./images/obs05.png)
 
