@@ -8,111 +8,96 @@ var DEFAULT_SIZE = {
   height: 360,
 }
 var stats = null;
+var loadParams = getLoadParams();
+var modelParams = getModelParams();
 
-function loadapp() {	
-  indicator = videoIndicator(getCanvas('outputVideo'))
-  indicator.loading()
-  start()
-}
-
-window.onload = (event) => {
-		
-  if (typeof Stats !== 'undefined' && Stats) {
-	  stats = new Stats();
-	  stats.showPanel(0);
-	  document.getElementById("stats").appendChild(stats.dom);
-  }
-  loadapp()
+function loadapp() {
+  indicator = videoIndicator(getCanvas('outputVideo'));
+  indicator.loading();
+  start();
 }
 
 function saveVideoSize(mediaStream) {
-  var s = mediaStream.getVideoTracks()[0].getSettings()
+  const s = mediaStream.getVideoTracks()[0].getSettings();
   VIDEO_SIZE.width = s.width;
   VIDEO_SIZE.height = s.height;
-  console.log("setting webcame size to: " + s.width + "x" + s.height);
+  console.log(`Setting webcame size to: ${s.width}x${s.height}`);
   camSizeChange(s.width, s.height);
 }
 
 function resizeVideo(size, targets) {
-  targets = targets === undefined ? ['input','output','buffer'] : targets;
-  if (targets.indexOf('input') >= 0) {
-    getVideo('inputVideo').width = size.width;
-    getVideo('inputVideo').height = size.height;
+  targets = targets || ['input', 'output', 'buffer'];
+  if (targets.includes('input')) {
+    getVideo().width = size.width;
+    getVideo().height = size.height;
   }
 
-  if (targets.indexOf('output') >= 0) {
-    getCanvas('outputVideo', false).width = size.width;
-    getCanvas('outputVideo', false).height = size.height;
+  if (targets.includes('output')) {
+    getCanvas('outputVideo').width = size.width;
+    getCanvas('outputVideo').height = size.height;
   }
 
-  if (targets.indexOf('buffer') >= 0) {
-    getCanvas('bufferVideo', false).width = size.width;
-    getCanvas('bufferVideo', false).height = size.height;
+  if (targets.includes('buffer')) {
+    getCanvas('bufferVideo').width = size.width;
+    getCanvas('bufferVideo').height = size.height;
   }
 }
 
 function getVideo() {
-  return document.getElementById("inputVideo");
+  return document.getElementById('inputVideo');
 }
 
-function getCanvas(id, getCtx) {
-  var canvas = document.getElementById(id);
-  if ( getCtx === true ){
-    return canvas.getContext('2d');
-  }
-  return canvas;
+function getCanvas(id, getCtx = false) {
+  const canvas = document.getElementById(id);
+  return getCtx ? canvas.getContext('2d') : canvas;
 }
 
 function errorMessage(message) {
-	var error = document.getElementById('error');
-	error.textContent = message;
+  const error = document.getElementById('error');
+  error.textContent = message;
 }
 
 function camSizeChange(width, height) {
-	var elem = document.getElementById("cam_size");
-	if (elem) {
-		elem.textContent = "Webcam size: " + width + "x" + height;
-	}
+  const elem = document.getElementById("cam_size");
+  if (elem) {
+    elem.textContent = `Webcam size: ${width}x${height}`;
+  }
 }
 
-var loadParams = getLoadParams();
-var modelParams = getModelParams();
-
 function setCameraDevices(devices) {
-  var cameraSelect = document.getElementById('camera');
+  const cameraSelect = document.getElementById('camera');
   if (cameraSelect) {
     while (cameraSelect.children.length > 1) {
       cameraSelect.removeChild(cameraSelect.lastElementChild);
     }
-    var selectOption;
-    for (var i = 0; i < devices.length; i++) {
-      selectOption = document.createElement("option");
-      selectOption.innerText = devices[i].label;
-      selectOption.value = devices[i].label;
+    for (const device of devices) {
+      const selectOption = document.createElement("option");
+      selectOption.innerText = device.label;
+      selectOption.value = device.label;
       cameraSelect.appendChild(selectOption);
     }
   }
-  var altCameraSelect = document.getElementById('altCamera');
+
+  const altCameraSelect = document.getElementById('altCamera');
   if (altCameraSelect) {
     while (altCameraSelect.children.length > 1) {
       altCameraSelect.removeChild(altCameraSelect.lastElementChild);
     }
-    var selectOption;
-    for (var i = 0; i < devices.length; i++) {
-      selectOption = document.createElement("option");
-      selectOption.innerText = devices[i].label;
-      selectOption.value = devices[i].label;
+    for (const device of devices) {
+      const selectOption = document.createElement("option");
+      selectOption.innerText = device.label;
+      selectOption.value = device.label;
       altCameraSelect.appendChild(selectOption);
     }
   }
 }
 
 function setCamera(camera, altCamera) {
-  var cameraSelect = document.getElementById('camera');
+  const cameraSelect = document.getElementById('camera');
   if (cameraSelect) {
     cameraSelect.value = camera;
   }
-  var altCameraSelect = document.getElementById('altCamera');
+  const altCameraSelect = document.getElementById('altCamera');
   if (altCameraSelect) {
     altCameraSelect.value = altCamera;
   }
@@ -121,121 +106,108 @@ function setCamera(camera, altCamera) {
 }
 
 function getLoadParams() {
-	const urlParams = new URLSearchParams(window.location.search);
-	var loadParams = {		
+  const urlParams = new URLSearchParams(window.location.search);
+  return {
     camera: urlParams.get('camera') || '',
     altCamera: urlParams.get('altCamera') || '',
-		architecture: urlParams.get('architecture') || 'MobileNetV1',
-		outputStride: parseInt(urlParams.get('outputStride')) || 16,
-		multiplier: parseFloat(urlParams.get('multiplier')) || 0.75,
-		quantBytes: parseInt(urlParams.get('quantBytes')) || 2,
-	};
-	return loadParams;
+    architecture: urlParams.get('architecture') || 'MobileNetV1',
+    outputStride: Number(urlParams.get('outputStride')) || 16,
+    multiplier: Number(urlParams.get('multiplier')) || 0.75,
+    quantBytes: Number(urlParams.get('quantBytes')) || 2,
+  };
 }
 
 function getModelParams() {
-	const urlParams = new URLSearchParams(window.location.search);
-	var modelParams = {
-		flipHorizontal: urlParams.get('flipHorizontal') == null ? true : urlParams.get('flipHorizontal') == "true",
-		internalResolution: urlParams.get('internalResolution') || "medium",
-		segmentationThreshold: parseFloat(urlParams.get('segmentationThreshold')) || 0.7,
-		maxDetections: parseInt(urlParams.get('maxDetections')) || 10,
-		scoreThreshold: parseFloat(urlParams.get('scoreThreshold')) || 0.3,
-		nmsRadius: parseInt(urlParams.get('nmsRadius')) || 20,
-		maskBlurAmount : parseInt(urlParams.get('maskBlurAmount')) || 3,
-	};
-	return modelParams;
+  const urlParams = new URLSearchParams(window.location.search);
+  return {
+    flipHorizontal: urlParams.get('flipHorizontal') == "true",
+    internalResolution: urlParams.get('internalResolution') || "medium",
+    segmentationThreshold: Number(urlParams.get('segmentationThreshold')) || 0.7,
+    maxDetections: Number(urlParams.get('maxDetections')) || 10,
+    scoreThreshold: Number(urlParams.get('scoreThreshold')) || 0.3,
+    nmsRadius: Number(urlParams.get('nmsRadius')) || 20,
+    maskBlurAmount: Number(urlParams.get('maskBlurAmount')) || 3,
+  };
 }
 
 async function start() {
-  var video = getVideo();
-  if (navigator.mediaDevices.getUserMedia) {
-    var videoConstraint = {
-      audio: false,
-      video: {
-        width: { min: 640, ideal: 1280, max: 1920 },
-        height: { min: 360, ideal: 720, max: 1080 }
-      }
-    }
-    var deviceId = await getDevices();
-    if (deviceId) {
-      videoConstraint.video.deviceId = deviceId;
-    }
-    navigator.mediaDevices.getUserMedia(videoConstraint)
-      .then(function (stream) {
-        errorMessage('');
-        saveVideoSize(stream);
-        resizeVideo(VIDEO_SIZE, ['input']);
-        resizeVideo(VIDEO_SIZE, ['output','buffer']);
-        video.srcObject = stream;
-        video.play();
-        video.onloadeddata = (e) => {
-          if (deviceId === undefined) {
-            start();
-          } else {
-            initMLModel();
-          }
-        }
-      })
-      .catch(function (err) {
-		errorMessage("Couldn't get the webcam object! " + err.message);
-        console.log("Something went wrong!");
-        console.error(err);
-      });
+  if (!navigator.mediaDevices.getUserMedia) return;
+
+  const videoConstraint = {
+    audio: false,
+    video: {
+      width: { min: 640, ideal: 1280, max: 1920 },
+      height: { min: 360, ideal: 720, max: 1080 },
+    },
+  };
+  const deviceId = await getDevices();
+  if (deviceId) {
+    videoConstraint.video.deviceId = deviceId;
   }
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(videoConstraint);
+  } catch (err) {
+    errorMessage(`Couldn't get the webcam object! ${err.message}`);
+    console.log("Something went wrong!");
+    console.error(err);
+    return;
+  }
+
+  errorMessage('');
+  saveVideoSize(stream);
+  resizeVideo(VIDEO_SIZE, ['input']);
+  resizeVideo(VIDEO_SIZE, ['output', 'buffer']);
+  const video = getVideo();
+  video.srcObject = stream;
+  video.play();
+  video.onloadeddata = () => {
+    if (deviceId === undefined) {
+      start();
+    } else {
+      initMLModel();
+    }
+  };
 }
 
-function getDevices() {
-  return new Promise(function(resolve) {
-    if (navigator.mediaDevices.enumerateDevices) {
-      navigator.mediaDevices.enumerateDevices()
-        .then(function (devices) {
-          var videoDevices = devices.filter(device => device.kind === 'videoinput');
-            if (videoDevices.length > 1 || videoDevices[0].deviceId !== '' && videoDevices[0].label !== '') {
-              setCameraDevices(videoDevices);
-              var cameraLabel = loadParams.camera;
-              var foundDevice = videoDevices.find(device => device.label === cameraLabel);
-              var altCameraLabel = loadParams.altCamera;
-              var foundAltDevice = videoDevices.find(device => device.label === altCameraLabel);
-              if (foundDevice) {
-                if (foundAltDevice) {
-                  setCamera(foundDevice.label, foundAltDevice.label);
-                } else {
-                  setCamera(foundDevice.label, '');
-                }
-                resolve(foundDevice.deviceId);
-              } else {
-                if (foundAltDevice) {
-                  setCamera('', foundAltDevice.label);
-                  resolve(foundAltDevice.deviceId);
-                } else {
-                  setCamera('', '');
-                  resolve('');
-                }
-              }
-            } else {
-              resolve();
-            }
-        }).catch(function () {
-          resolve(false);
-        });
-    } else {
-      resolve(false);
-    }
-  });
+async function getDevices() {
+  if (!navigator.mediaDevices.enumerateDevices) {
+    return null;
+  }
+
+  let devices;
+  try {
+    devices = await navigator.mediaDevices.enumerateDevices();
+  } catch (ignored) {
+    return null;
+  }
+
+  const videoDevices = devices.filter(device => device.kind === 'videoinput');
+  if (!videoDevices.length || videoDevices[0].deviceId === '' || videoDevices[0].label === '') {
+    return null;
+  }
+
+  setCameraDevices(videoDevices);
+
+  const cameraLabel = loadParams.camera;
+  const foundDevice = videoDevices.find(device => device.label === cameraLabel);
+  const altCameraLabel = loadParams.altCamera;
+  const foundAltDevice = videoDevices.find(device => device.label === altCameraLabel);
+
+  setCamera(foundDevice?.label || '', foundAltDevice?.label || '');
+  return foundDevice?.deviceId || foundAltDevice?.deviceId || null;
 }
 
 async function initMLModel() {
-  var video = getVideo();
-  var canvas = getCanvas("outputVideo");
-  console.log('Loading model with params:');
-  console.log(loadParams);
+  const video = getVideo();
+  const canvas = getCanvas("outputVideo");
+  console.log('Loading model with params:', loadParams);
   await bodyPix.load(loadParams).then(model => {
     console.log('BodyPix model loaded.');
     indicator.stop();
-	
-	console.log('Model parameters:');
-	console.log(modelParams);
+
+    console.log('Model parameters:', modelParams);
     transformFrame(model, video, canvas);
   }).catch(err => {
     indicator.stop();
@@ -245,31 +217,35 @@ async function initMLModel() {
 }
 
 async function transformFrame(model, sourceVideo, targetCanvas) {
-  var w = VIDEO_SIZE.width;
-  var h = VIDEO_SIZE.height;
-  var tempCtx = getCanvas('bufferVideo', true);
-      tempCtx.drawImage(sourceVideo, 0, 0, w, h);
-  var frame = getCanvas('bufferVideo');
+  const w = VIDEO_SIZE.width;
+  const h = VIDEO_SIZE.height;
+  const tempCtx = getCanvas('bufferVideo', true);
+  tempCtx.drawImage(sourceVideo, 0, 0, w, h);
+  const frame = getCanvas('bufferVideo');
 
-  await model.segmentPerson(frame, modelParams).then(segments => {
-      const foregroundColor = {r: 0, g: 0,   b: 0, a: 0};
-      const backgroundColor = {r: 0, g: 255, b: 0, a: 255};
-      var maskSegmentation = bodyPix.toMask( segments, foregroundColor, backgroundColor);
-      bodyPix.drawMask(
-        targetCanvas,
-        frame,
-        maskSegmentation,
-        1, // opacity
-        modelParams.maskBlurAmount, // mask blur amount,
-        modelParams.flipHorizontal // flip horizontal
-      );
-    window.requestAnimationFrame(()=>{
-      if (stats) stats.begin();
-      transformFrame(model, sourceVideo, targetCanvas)
-      if (stats) stats.end();
-    });
-  }).catch(err => {
+  let segments
+  try {
+    segments = await model.segmentPerson(frame, modelParams)
+  } catch (err) {
     console.error(err);
+    return;
+  }
+
+  const foregroundColor = { r: 0, g: 0, b: 0, a: 0 };
+  const backgroundColor = { r: 0, g: 255, b: 0, a: 255 };
+  const maskSegmentation = bodyPix.toMask(segments, foregroundColor, backgroundColor);
+  bodyPix.drawMask(
+    targetCanvas,
+    frame,
+    maskSegmentation,
+    1, // opacity
+    modelParams.maskBlurAmount, // mask blur amount,
+    modelParams.flipHorizontal, // flip horizontal
+  );
+  window.requestAnimationFrame(() => {
+    if (stats) stats.begin();
+    transformFrame(model, sourceVideo, targetCanvas)
+    if (stats) stats.end();
   });
 }
 
@@ -281,40 +257,40 @@ async function transformFrame(model, sourceVideo, targetCanvas) {
  * @return {void}
  */
 function videoIndicator(canvas) {
-  var ctx = canvas.getContext('2d');
-  var center = {
-      x: canvas.width/2,
-      y: canvas.height/2
+  const ctx = canvas.getContext('2d');
+  const center = {
+    x: canvas.width / 2,
+    y: canvas.height / 2
   }
-  var bigCircle = {
+  const bigCircle = {
     center: center,
     radius: 50,
     speed: 3
   }
-  var smallCirlce = {
+  const smallCirlce = {
     center: center,
     radius: 30,
     speed: 2
   }
 
-  var isLoading = true;
-  var progress = 0;
+  let isLoading = true;
+  let progress = 0;
 
   function loading() {
-      if (isLoading == false)
-        return 0
+    if (isLoading == false)
+      return 0
 
-      progress += 0.01;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (progress > 1) {
-        progress = 0;
-      }
+    progress += 0.01;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (progress > 1) {
+      progress = 0;
+    }
 
-      drawText(center.x, center.y);
-      drawCircle(bigCircle, progress);
-      drawCircle(smallCirlce, progress);
+    drawText(center.x, center.y);
+    drawCircle(bigCircle, progress);
+    drawCircle(smallCirlce, progress);
 
-      return window.requestAnimationFrame(loading);
+    return window.requestAnimationFrame(loading);
   }
   function drawText(x, y) {
     ctx.font = "12px Arial";
@@ -324,26 +300,26 @@ function videoIndicator(canvas) {
   }
 
   function drawCircle(circle, progress) {
-      ctx.beginPath();
-      var start = accelerateInterpolator(progress) * circle.speed;
-      var end = decelerateInterpolator(progress) * circle.speed;
-      ctx.arc(circle.center.x, circle.center.y, circle.radius, (start - 0.5) * Math.PI, (end - 0.5) * Math.PI);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "grey";
-      ctx.stroke();
+    ctx.beginPath();
+    const start = accelerateInterpolator(progress) * circle.speed;
+    const end = decelerateInterpolator(progress) * circle.speed;
+    ctx.arc(circle.center.x, circle.center.y, circle.radius, (start - 0.5) * Math.PI, (end - 0.5) * Math.PI);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "grey";
+    ctx.stroke();
   }
 
   function accelerateInterpolator(x) {
-      return x * x;
+    return x * x;
   }
 
   function decelerateInterpolator(x) {
-      return 1 - ((1 - x) * (1 - x));
+    return 1 - ((1 - x) * (1 - x));
   }
 
   function stop() {
-    isLoading = false
+    isLoading = false;
   }
 
-  return {loading, stop}
+  return { loading, stop };
 }

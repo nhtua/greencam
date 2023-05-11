@@ -1,6 +1,21 @@
 * {
-margin: 0;
-padding: 0;
+  margin: 0;
+  padding: 0;
 }
-#inputVideo {display: none}
-#bufferVideo {display: none}
+#inputVideo {
+  display: none;
+}
+#bufferVideo {
+  display: none;
+}
+#error {
+  color: red;
+}
+
+.nice {
+  padding: 2rem;
+}
+.nice #stats > div {
+  right: 0 !important;
+  left: auto !important;
+}
