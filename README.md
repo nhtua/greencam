@@ -52,6 +52,7 @@ Open `index.html` in your favorite browser and make some change as you wish.
 
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
 
-- [x] Top priority, to improve `initMLModel()` and `transformFrame()` which is the bottle-neck for video output frame-rate
+- [ ] ⬆Top priority, to improve `initMLModel()` and `transformFrame()` which is the bottle-neck for video output frame-rate
+- [x] Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
 - [ ] Custom background color, video
-- [ ] Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
+
