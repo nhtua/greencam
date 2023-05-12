@@ -1,9 +1,12 @@
 # GreenCam
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4ccf5f3b-b414-4da1-bf50-97955adbd300/deploy-status)](https://greencam.netlify.app) 👈 Try it here!
 
-## __Special note for version pre-v1.0.0 (online version)__
+## 🎉🎉🎉 Version 1.0.0 is OUT now
 
-The online version which is hosted on netlify is always up to date. Latest version is `pre-v1.0.0`. This new version gives you abitlity to control GreenCam parameters, play with it back and forth until you satisfy with GreenCam's output. Just remember to click on a button - **reload model** - to refresh and preview your choices. At the end of home page, you'll get a generated URL, which will hide all other controller, make you a clean output for OBS. You can consume this URL in OBS Browser plugin or open in a new tab.
+The online version which is hosted on Netlify is always up to date. Latest version is `v1.0.0`. This new version gives you abitlity to control GreenCam parameters, play with it back and forth until you satisfy with GreenCam's output. Just remember, I picked the best parameters by default for you. Try it first in Chrome for the best result. At the end of home page, you'll get a generated URL, which will hide all other controller, make you a clean output for OBS. You can consume this URL in OBS Browser plugin or open in a new tab. 
+
+👏 Big shout-out to [@Shahin Sorkh](https://github.com/ShahinSorkh) with their great improvemnet for GreenCam UI.
+and off course, lot of love to contributors [@Christopher Lee](https://github.com/CCInc) [@Eduard Reñé Claramunt](https://github.com/edurenye) and [@Linus Schlumberger](https://github.com/Killusions).
 
 ## What is GreenCam?
 
@@ -49,6 +52,6 @@ Open `index.html` in your favorite browser and make some change as you wish.
 
 It is a hack I did at the midnight, then some errors or incompatible problems will happens in your machine. Also, there are a lot of features that may be included in next version of GreenCam, like:
 
-- [x] Custom parameters/algorithm to have smoother, better shapes
+- [x] Top priority, to improve `initMLModel()` and `transformFrame()` which is the bottle-neck for video output frame-rate
 - [ ] Custom background color, video
 - [ ] Add an editor that can run in browser to test customized parameters and generate a link to run in OBS
