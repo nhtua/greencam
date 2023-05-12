@@ -1,96 +1,175 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Virtual Green Background</title>
     <script src="node_modules/@tensorflow/tfjs/dist/tf.min.js" charset="utf-8"></script>
     <script src="node_modules/@tensorflow-models/body-pix/dist/body-pix.min.js" charset="utf-8"></script>
     <script src="node_modules/bluebird/js/browser/bluebird.min.js" charset="utf-8"></script>
     <script src="node_modules/stats.js/build/stats.min.js" charset="utf-8"></script>
-	<script>
-		var loadParams = {};
-		var modelParams = {};
-		const urlParams = new URLSearchParams(window.location.search);
-		var urlBase = location.href.substring(0, location.href.lastIndexOf("/")+1);
-		function updateUrl() {
-			var url = urlBase + 'player.html?' + new URLSearchParams(Object.assign({}, loadParams, modelParams)).toString();
-			document.getElementById('paramsUrl').href = url;
-			document.getElementById('paramsUrl').innerHTML = url;			
-		}
-		function updateLoadParam(key, val){
-			loadParams[key] = val;
-			updateUrl();
-		}
-		function updateModelParam(key, val){
-			modelParams[key] = val;
-			updateUrl();
-		}
-	</script>
     <script src="app.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="node_modules/normalize.css/normalize.css">
+    <link rel="stylesheet" href="node_modules/milligram/dist/milligram.css">
     <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-	<p id="error"></p>
-	<div id="stats"></div>
-    <video  id="inputVideo" width="640" height="480"></video>
-    <canvas id="outputVideo" width="640" height="480"></canvas>
-    <canvas id="bufferVideo"  width="640" height="480"></canvas>
-	<div id="cam_size"></div>
-	<label for="camera">Camera:</label>
-	<select name="camera" id="camera" onchange="updateLoadParam('camera', this.value);">
-	  <option value="">default</option>
-	</select>
-	<label for="altCamera">Alternative Camera (If not available):</label>
-	<select name="altCamera" id="altCamera" onchange="updateLoadParam('altCamera', this.value);">
-	  <option value="">default</option>
-	</select>
-	<label for="net">Network:</label>
-	<select name="net" id="net" onchange="updateLoadParam('architecture', this.value);">
-	  <option value="MobileNetV1" selected="selected">MobileNetV1</option>
-	  <option value="ResNet50">ResNet50</option>
-	</select>
-	<label for="stride">Output Stride:</label>
-	<select name="stride" id="stride" onchange="updateLoadParam('outputStride', parseInt(this.value));">
-	  <option value="8">8 (mobilenet only)</option>
-	  <option value="16" selected="selected">16</option>
-	  <option value="32">32 (resnet only)</option>
-	</select>
-	<label for="multiplier">Multiplier:</label>
-	<select name="multiplier" id="multiplier" onchange="updateLoadParam('multiplier', parseFloat(this.value));">
-	  <option value="0.5">0.5 (mobilenet only)</option>
-	  <option value="0.75" selected="selected">0.75 (mobilenet only)</option>
-	  <option value="1.0">1.0</option>
-	</select>
-	<label for="quantBytes">Quantization Bytes:</label>
-	<select name="quantBytes" id="quantBytes" onchange="updateLoadParam('quantBytes', parseInt(this.value));">
-	  <option value="1">1</option>
-	  <option value="2" selected="selected">2</option>
-	  <option value="4">4</option>
-	</select>
-	<button type="button" onclick="loadapp()">Reload Model</button>
-	</br>
-	<label for="internalResolution">internalResolution:</label>
-	<select name="internalResolution" id="internalResolution" onchange="updateModelParam('internalResolution', this.value);">
-	  <option value="low">low</option>
-	  <option value="medium" selected="selected">medium</option>
-	  <option value="high">high</option>
-	  <option value="full">full</option>
-	</select>
-	<label for="segmentationThreshold">segmentationThreshold:</label>
-	<input type="number" step=".1" min="0" max="1" name="segmentationThreshold" value="0.7" id="segmentationThreshold" onchange="updateModelParam('segmentationThreshold', parseFloat(this.value));"/>
-	<label for="maxDetections">maxDetections:</label>
-	<input type="number" step="1" name="maxDetections" value="10" id="maxDetections" onchange="updateModelParam('maxDetections', parseInt(this.value));"/>
-	<label for="scoreThreshold">scoreThreshold:</label>
-	<input type="number" min="0" max="1" step=".1" name="scoreThreshold" value="0.3" id="scoreThreshold" onchange="updateModelParam('scoreThreshold', parseFloat(this.value));"/>
-	<label for="nmsRadius">nmsRadius:</label>
-	<input type="number" step="1" name="nmsRadius" value="20" id="nmsRadius" onchange="updateModelParam('nmsRadius', parseInt(this.value));"/>
-	<label for="maskBlurAmount">maskBlurAmount:</label>
-	<input type="number" step="1" name="maskBlurAmount" value="3" id="maskBlurAmount" onchange="updateModelParam('maskBlurAmount', parseInt(this.value));"/>
-	</br>
-	<label for="paramsUrl">Url String:</label>
-	<a id="paramsUrl" name="paramsUrl" /><br><br>
-	<script>
-		updateUrl();
-	</script>
-  </body>
+</head>
+
+<body class="nice">
+    <div id="stats"></div>
+    <div class="row">
+        <div class="column">
+            <video id="inputVideo" width="640" height="480"></video>
+            <canvas id="outputVideo" width="640" height="480"></canvas>
+            <canvas id="bufferVideo" width="640" height="480"></canvas>
+        </div>
+        <div class="column">
+            <p id="error"></p>
+            <div id="cam_size"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="camera">Camera:</label>
+            <select name="camera" id="camera" data-input-type="load">
+                <option value="">default</option>
+            </select>
+        </div>
+        <div class="column">
+            <label for="altCamera">Alternative Camera (If not available):</label>
+            <select name="altCamera" id="altCamera" data-input-type="load">
+                <option value="">default</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="net">Network:</label>
+            <select name="architecture" id="net" data-input-type="load">
+                <option value="MobileNetV1" selected="selected">MobileNetV1</option>
+                <option value="ResNet50">ResNet50</option>
+            </select>
+        </div>
+        <div class="column">
+            <label for="stride">Output Stride:</label>
+            <select name="outputStride" id="stride" data-input-type="load">
+                <option value="8">8 (mobilenet only)</option>
+                <option value="16" selected="selected">16</option>
+                <option value="32">32 (resnet only)</option>
+            </select>
+        </div>
+        <div class="column">
+            <label for="multiplier">Multiplier:</label>
+            <select name="multiplier" id="multiplier" data-input-type="load">
+                <option value="0.5">0.5 (mobilenet only)</option>
+                <option value="0.75" selected="selected">0.75 (mobilenet only)</option>
+                <option value="1">1.0</option>
+            </select>
+        </div>
+        <div class="column">
+            <label for="quantBytes">Quantization Bytes:</label>
+            <select name="quantBytes" id="quantBytes" data-input-type="load">
+                <option value="1">1</option>
+                <option value="2" selected="selected">2</option>
+                <option value="4">4</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <label for="internalResolution">internalResolution:</label>
+            <select name="internalResolution" id="internalResolution" data-input-type="model">
+                <option value="low">low</option>
+                <option value="medium" selected="selected">medium</option>
+                <option value="high">high</option>
+                <option value="full">full</option>
+            </select>
+        </div>
+        <div class="column">
+            <label for="segmentationThreshold">segmentationThreshold:</label>
+            <input type="number" step=".1" min="0" max="1" name="segmentationThreshold" value="0.7"
+                id="segmentationThreshold" data-input-type="model" />
+        </div>
+        <div class="column">
+            <label for="maxDetections">maxDetections:</label>
+            <input type="number" step="1" name="maxDetections" value="10" id="maxDetections" data-input-type="model" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <label for="scoreThreshold">scoreThreshold:</label>
+            <input type="number" min="0" max="1" step=".1" name="scoreThreshold" value="0.3" id="scoreThreshold"
+                data-input-type="model" />
+        </div>
+        <div class="column">
+            <label for="nmsRadius">nmsRadius:</label>
+            <input type="number" step="1" name="nmsRadius" value="20" id="nmsRadius" data-input-type="model" />
+        </div>
+        <div class="column">
+            <label for="maskBlurAmount">maskBlurAmount:</label>
+            <input type="number" step="1" name="maskBlurAmount" value="3" id="maskBlurAmount" data-input-type="model" />
+        </div>
+        <div class="column">
+            <label for="flipHorizontal">flipHorizontal:</label>
+            <select name="flipHorizontal" id="flipHorizontal" data-input-type="model">
+                <option value="true">Yes</option>
+                <option value="false" selected>No</option>
+            </select>
+        </div>
+    </div>
+
+    <label for="paramsUrl">Url String:</label>
+    <a id="paramsUrl" name="paramsUrl" />
+    <script>
+        var loadParams = {};
+        var modelParams = {};
+
+        window.addEventListener('load', () => {
+            stats = new Stats();
+            stats.showPanel(0);
+            document.getElementById("stats").appendChild(stats.dom);
+        });
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlBase = location.href.substring(0, location.href.lastIndexOf("/"));
+            const numRegex = /^\d+(\.\d+)?$/;
+            function updateUrl() {
+                const allParams = { ...loadParams, ...modelParams };
+                const url = `${urlBase}/player.html?${new URLSearchParams(allParams)}`;
+                const urlElem = document.getElementById('paramsUrl');
+                urlElem.href = urlElem.innerHTML = url;
+            }
+            function updateParam(elem) {
+                const inputType = elem.dataset.inputType;
+                const inputName = elem.name;
+                const inputValue = numRegex.test(elem.value) ? Number(elem.value) : elem.value;
+                if (inputType === 'load') {
+                    loadParams[inputName] = inputValue;
+                } else {
+                    modelParams[inputName] = inputValue;
+                }
+                updateUrl();
+            }
+
+            document.querySelectorAll('input, select').forEach((elem) => {
+                if (urlParams.has(elem.name)) {
+                    const v = urlParams.get(elem.name);
+                    elem.value = numRegex.test(v) ? Number(v) : v;
+                }
+                updateParam(elem);
+                elem.addEventListener('change', (event) => {
+                    updateParam(event.target);
+                    if (event.target.dataset.inputType === 'load');
+                    loadapp();
+                });
+            });
+
+            loadapp();
+        });
+    </script>
+</body>
+
 </html>
